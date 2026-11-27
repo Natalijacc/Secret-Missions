@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e0816">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Secret Missions">
+<title>Secret Missions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/*
+VOICE: loud, playful, after-dark; one-handed and readable in a dim room
+IDEA: a glowing VIP pass / sealed mission card you keep in your pocket
+PICTURE: the mission card itself, big type on a neon-edged slab
+COLOUR and TYPE: near-black plum, hot pink action, cyan + lime highlights; Unbounded + Inter
+LAYOUT: single column, big thumb targets, bottom tab bar during play
+*/
+:root{--bg:#0e0816;--s1:#1a1026;--s2:#26173a;--line:#3b2754;--ink:#f8f1ff;--mut:#b6a6cc;--pink:#ff2e93;--cyan:#22e6d8;--lime:#c6ff3d;--red:#ff5a5a;color-scheme:dark}
+*{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 Inter,system-ui,-apple-system,sans-serif;overflow-x:clip}
+body{min-height:100dvh;background:radial-gradient(120% 55% at 50% -12%,#3d0f4a 0,transparent 62%),radial-gradient(90% 50% at 110% 105%,#0a3c46 0,transparent 60%),var(--bg);background-attachment:fixed}
+#app{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 18px calc(env(safe-area-inset-bottom) + 108px)}
+h1,h2,h3,.display{font-family:Unbounded,Inter,sans-serif;line-height:1.08;margin:0}
+h1{font-size:clamp(44px,13vw,64px);font-weight:800;letter-spacing:-.01em}
+h2{font-size:26px;font-weight:800;margin:8px 0 16px}
+h3{font-size:18px;font-weight:600;margin:28px 0 10px}
+p{margin:0 0 10px}
+small{font-size:13px}
+.muted{color:var(--mut)}.small{font-size:14px}.center{text-align:center}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;margin-bottom:14px}
+.brand{font:800 15px Unbounded,sans-serif;color:var(--pink);text-shadow:0 0 18px rgba(255,46,147,.6)}
+.net{font:600 13px Inter;padding:6px 12px;border-radius:99px;background:var(--s2);color:var(--mut);white-space:nowrap}
+.net.ok{color:var(--lime)}.net.ok::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--lime);margin-right:7px;box-shadow:0 0 8px var(--lime)}
+.net.bad{color:#ffb35a}
+.back{background:none;border:0;color:var(--mut);font:600 16px Inter;min-height:44px;padding:0 4px}
+.hero{padding:34px 0 22px}
+.hero h1{background:linear-gradient(100deg,#fff 10%,var(--pink) 55%,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(255,46,147,.35))}
+.lead{font-size:18px;color:var(--mut);margin-top:16px;max-width:30em}
+.stack{display:grid;gap:12px;margin:22px 0}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:58px;padding:12px 18px;border:0;border-radius:18px;font:700 18px Inter,sans-serif;color:#17041f;background:var(--pink);box-shadow:0 0 26px rgba(255,46,147,.45);cursor:pointer;transition:transform .1s;margin-top:12px}
+.btn:active{transform:scale(.97)}
+.btn.alt{background:var(--s2);color:var(--ink);box-shadow:none;border:1px solid var(--line)}
+.btn.big{min-height:76px;font-size:22px;font-family:Unbounded,sans-serif;font-weight:800}
+.btn.slim{min-height:48px;font-size:16px}
+.btn.danger{background:transparent;color:var(--red);border:1px solid var(--red);box-shadow:none}
+.btn[disabled]{opacity:.45;box-shadow:none}
+.link{display:block;margin:18px auto 0;background:none;border:0;color:var(--mut);font:600 15px Inter;text-decoration:underline;min-height:44px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+.resume{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:64px;padding:14px 18px;border-radius:18px;border:1px solid var(--cyan);background:rgba(34,230,216,.08);color:var(--ink);font:600 16px Inter;text-align:left}
+.resume b{color:var(--cyan);font-family:Unbounded}.arrow{font-size:22px;color:var(--cyan)}
+.how{padding-left:22px;color:var(--mut);margin-top:30px}.how li{margin-bottom:12px}.how b{color:var(--ink)}
+.form{display:grid;gap:18px}
+.fld{display:grid;gap:8px}.fld>span{font-weight:700}.fld small{display:block;font-weight:400;color:var(--mut)}
+input[type=text],input:not([type]),textarea{width:100%;font:16px Inter,sans-serif;padding:15px 16px;border-radius:14px;background:var(--s1);border:1px solid var(--line);color:var(--ink)}
+textarea{resize:vertical;min-height:96px}
+.codein{font:800 34px Unbounded,sans-serif!important;letter-spacing:.3em;text-transform:uppercase;text-align:center;color:var(--lime)!important}
+.tg{display:flex;align-items:center;gap:14px;min-height:56px;padding:10px 14px;border-radius:16px;background:var(--s1);border:1px solid var(--line);margin-top:12px;cursor:pointer}
+.tg input{position:absolute;opacity:0;pointer-events:none}
+.tg small{display:block;color:var(--mut)}
+.sw{flex:none;width:52px;height:32px;border-radius:99px;background:var(--line);position:relative;transition:background .2s}
+.sw::after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .2s}
+.tg input:checked+.sw{background:var(--pink)}.tg input:checked+.sw::after{transform:translateX(20px)}
+.tg input:focus-visible+.sw{outline:3px solid var(--cyan)}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.seg.four{grid-template-columns:repeat(4,minmax(0,1fr))}.seg.two-up{grid-template-columns:repeat(2,minmax(0,1fr))}
+.seg button{min-height:60px;padding:10px 6px;border-radius:14px;border:1px solid var(--line);background:var(--s1);color:var(--ink);font:600 15px Inter;display:grid;gap:2px;align-content:center}
+.seg button small{color:var(--mut);font-size:12px;line-height:1.25}
+.seg button.on{background:var(--pink);border-color:var(--pink);color:#17041f;box-shadow:0 0 18px rgba(255,46,147,.4)}.seg button.on small{color:#3b0a2b}
+.lbl{font:600 13px Inter;color:var(--cyan);margin-bottom:8px;letter-spacing:.02em}
+.code{font:800 clamp(56px,18vw,76px)/1 Unbounded,sans-serif;letter-spacing:.08em;color:var(--lime);text-align:center;text-shadow:0 0 30px rgba(198,255,61,.45);margin:2px 0 18px}
+.code.sm{font-size:40px;margin-top:18px}
+.qr{background:#fff;border-radius:20px;padding:12px;width:min(230px,62vw);margin:0 auto 14px;box-shadow:0 0 40px rgba(34,230,216,.3)}
+.qr svg{display:block;width:100%;height:auto}
+.warn{background:rgba(255,179,90,.12);border:1px solid #ffb35a;color:#ffd7a6;border-radius:14px;padding:12px 14px;font-size:14px;margin-top:14px}
+.chips{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
+.chips li{display:flex;align-items:center;gap:6px;padding:8px 8px 8px 14px;border-radius:99px;background:var(--s2);border:1px solid var(--line);font-weight:600;min-height:44px}
+.chips li.off{opacity:.5}.chips small{color:var(--cyan);font-weight:600}
+.x{min-width:36px;min-height:36px;border-radius:99px;border:0;background:var(--s1);color:var(--mut);font:600 15px Inter;padding:0 10px}
+.summary{margin-top:22px;padding:12px 14px;border-radius:14px;border:1px dashed var(--line);color:var(--mut);font-size:15px}
+.wait{display:flex;align-items:center;gap:12px;justify-content:center;padding:18px;color:var(--mut);font-weight:600;text-align:center}
+.pulse{flex:none;width:12px;height:12px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 0 rgba(34,230,216,.7);animation:pulse 1.6s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 14px rgba(34,230,216,0)}100%{box-shadow:0 0 0 0 rgba(34,230,216,0)}}
+.me{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;font-weight:700;font-size:18px}
+.pts{font:800 24px Unbounded,sans-serif;color:var(--lime);margin-left:auto;white-space:nowrap}.pts small{font:600 13px Inter;color:var(--mut)}
+.card{position:relative;overflow:hidden;background:linear-gradient(160deg,#2c1244 0%,#170c24 70%);border:1px solid #5e2c80;border-radius:28px;padding:26px 22px 22px;box-shadow:0 0 0 1px rgba(255,46,147,.22),0 24px 60px -24px rgba(255,46,147,.6)}
+.card::before{content:"";position:absolute;inset:-40% -30% auto auto;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(34,230,216,.28),transparent 70%)}
+.card.fresh{animation:pop .55s cubic-bezier(.2,.9,.3,1.3)}
+.card.pend{border-color:var(--cyan)}
+@keyframes pop{0%{transform:scale(.9) rotate(-2deg);opacity:0}100%{transform:none;opacity:1}}
+.mtext{position:relative;font:800 clamp(26px,7.6vw,36px)/1.14 Unbounded,sans-serif;margin:6px 0 16px;text-wrap:balance;overflow-wrap:anywhere}
+.mtext.dim{color:var(--mut);font-size:22px}
+.hush{position:relative;color:var(--mut);font-size:14px;margin:0}
+.board{list-style:none;padding:0;margin:0}
+.row{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line);min-height:60px}
+.row.mine .nm{color:var(--pink)}
+.rank{width:26px;font:800 16px Unbounded,sans-serif;color:var(--mut)}
+.dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--line)}.dot.on{background:var(--lime);box-shadow:0 0 8px var(--lime)}
+.nm{font-weight:700;display:grid}.nm small{font-weight:400;color:var(--mut)}
+.feed{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+.feed li{padding:14px 16px;border-radius:18px;background:var(--s1);border:1px solid var(--line)}
+.feed p{margin:0 0 4px}.feed .cons{color:var(--lime)}.feed time{font-size:13px;color:var(--mut)}
+.empty{color:var(--mut);text-align:center;padding:40px 10px}
+.recap h1{font-size:clamp(36px,11vw,54px);color:var(--lime);text-shadow:0 0 30px rgba(198,255,61,.4);margin:6px 0 8px;overflow-wrap:anywhere}
+.awards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:22px 0}
+.awards div{background:var(--s1);border:1px solid var(--line);border-radius:18px;padding:14px 10px;display:grid;gap:4px;text-align:center}
+.awards small{color:var(--cyan);font-weight:600}.awards b{font:800 17px Unbounded,sans-serif;overflow-wrap:anywhere}.awards span{font-size:13px;color:var(--mut)}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;background:rgba(14,8,22,.93);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 10px calc(env(safe-area-inset-bottom) + 6px)}
+.tabs button{min-height:56px;background:none;border:0;color:var(--mut);font:700 15px Inter;border-radius:14px}
+.tabs button.on{color:var(--ink);background:var(--s2)}
+.tabs .badge{color:var(--cyan)}
+#modal .ov{position:fixed;inset:0;z-index:50;background:rgba(6,2,10,.84);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;padding:16px 14px calc(env(safe-area-inset-bottom) + 16px)}
+.sheet{width:100%;max-width:520px;background:linear-gradient(170deg,#2a1440,#160b22);border:1px solid #5e2c80;border-radius:28px;padding:26px 22px 20px;animation:up .4s cubic-bezier(.2,.9,.3,1.2);max-height:90dvh;overflow:auto}
+.sheet.ask{border-color:var(--cyan);box-shadow:0 0 50px -10px rgba(34,230,216,.5)}
+.q{font:800 clamp(22px,6.4vw,30px)/1.18 Unbounded,sans-serif;margin:8px 0 14px;text-wrap:balance;overflow-wrap:anywhere}
+.q.big{font-size:clamp(26px,7.5vw,36px);color:var(--lime)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:10px}.two .btn{margin-top:6px}
+@keyframes up{0%{transform:translateY(40px);opacity:0}100%{transform:none;opacity:1}}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 92px);transform:translate(-50%,20px);opacity:0;z-index:70;background:var(--ink);color:#17041f;font-weight:700;padding:12px 18px;border-radius:14px;max-width:90vw;transition:.25s;pointer-events:none;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#news{position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top) + 10px);z-index:65;max-width:540px;margin:0 auto;padding:14px 16px;border-radius:18px;background:linear-gradient(120deg,#ff2e93,#a63bff);color:#fff;font-weight:600;box-shadow:0 10px 40px -8px rgba(255,46,147,.7);transform:translateY(-140%);transition:transform .35s cubic-bezier(.2,.9,.3,1.2);pointer-events:none}
+#news.show{transform:none}#news b{font-family:Unbounded,sans-serif}#news small{display:block;opacity:.9;margin-top:2px}
+#fx span{position:fixed;top:-20px;width:10px;height:16px;border-radius:2px;z-index:60;pointer-events:none;animation:fall 1.6s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),112vh) rotate(760deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="news" role="status" aria-live="polite"></div>
+<div id="fx"></div>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+{
+'use strict';
+/* ---------- content ---------- */
+// [spice 1-3, mission (holder's view, {t}=target), confirm question (target's view, {h}=holder)]
+const M=[
+[1,'Get {t} to high-five you','Did {h} get you to high-five them?'],
+[1,'Get {t} to say the word “banana”','Did {h} get you to say “banana”?'],
+[1,'Take a selfie with {t}','Did {h} take a selfie with you?'],
+[1,'Get {t} to fist-bump you','Did {h} get you to fist-bump them?'],
+[1,'Get {t} to sing at least one line of a song','Did {h} get you to sing a line of a song?'],
+[1,'Get {t} to tell you about the first concert they went to','Did {h} get you to tell them about your first concert?'],
+[1,'Get {t} to bring you a drink or a snack','Did {h} get you to bring them a drink or snack?'],
+[1,'Get {t} to say “you’re absolutely right” to you','Did {h} get you to say “you’re absolutely right”?'],
+[1,'Get {t} to clink glasses with you and say “cheers”','Did {h} get you to clink glasses and say “cheers”?'],
+[1,'Get {t} to tell you a joke','Did {h} get you to tell them a joke?'],
+[1,'Get {t} to say your full name','Did {h} get you to say their full name?'],
+[1,'Get {t} to give you a compliment','Did {h} get you to compliment them?'],
+[1,'Get {t} to teach you a secret handshake','Did {h} get you to teach them a handshake?'],
+[1,'Get {t} to do an impression of anyone','Did {h} get you to do an impression?'],
+[1,'Get {t} to ask you what time it is','Did you ask {h} what time it is?'],
+[1,'Get {t} to use the word “fantastic” in a sentence','Did {h} get you to say “fantastic”?'],
+[1,'Get {t} to tell you their go-to karaoke song','Did {h} get you to tell them your karaoke song?'],
+[1,'Get {t} to thumb-wrestle you','Did {h} get you to thumb-wrestle them?'],
+[1,'Get {t} to make a silly face for a photo with you','Did {h} get you to make a silly face for a photo?'],
+[1,'Get {t} to say “I’m so proud of you” to you','Did {h} get you to say “I’m so proud of you”?'],
+[2,'Get {t} to dance with you for at least 10 seconds','Did {h} get you to dance with them?'],
+[2,'Get {t} to swap an accessory with you (hat, glasses, jacket…)','Did {h} get you to swap an accessory with them?'],
+[2,'Get {t} to talk in a fake accent for a whole minute','Did {h} get you to talk in a fake accent?'],
+[2,'Get {t} to arm-wrestle you','Did {h} get you to arm-wrestle them?'],
+[2,'Get {t} to let you restyle their hair','Did {h} get to restyle your hair?'],
+[2,'Get {t} to tell you their celebrity crush','Did {h} get you to reveal your celebrity crush?'],
+[2,'Get {t} to do their best evil laugh','Did {h} get you to do an evil laugh?'],
+[2,'Get {t} to hug you','Did {h} get a hug from you?'],
+[2,'Get {t} to call you “boss”','Did {h} get you to call them “boss”?'],
+[2,'Get {t} to tell you their most embarrassing moment','Did {h} get you to tell them your most embarrassing moment?'],
+[2,'Get {t} to let you draw a tiny doodle on their hand','Did {h} get to draw on your hand?'],
+[2,'Get {t} into a staring contest with you','Did {h} get you into a staring contest?'],
+[2,'Get {t} to do 5 push-ups','Did {h} get you to do 5 push-ups?'],
+[2,'Get {t} to try a weird snack combo you made','Did {h} get you to try their weird snack combo?'],
+[2,'Get {t} to show you their best dance move','Did {h} get you to show off a dance move?'],
+[3,'Get {t} to give a toast to the whole room','Did {h} get you to give a toast?'],
+[3,'Get {t} to slow-dance with you','Did {h} get you to slow-dance with them?'],
+[3,'Get {t} to serenade someone at the party','Did {h} get you to serenade someone?'],
+[3,'Get {t} to propose to you on one knee','Did {h} get you to propose to them?'],
+[3,'Get {t} to do a runway walk across the room','Did {h} get you to do a runway walk?'],
+[3,'Get {t} to start a conga line','Did {h} get you to start a conga line?'],
+[3,'Get {t} to yell “I’m the king of the world!”','Did {h} get you to yell “I’m the king of the world!”?'],
+[3,'Get {t} to wear something of yours for 15 minutes','Did {h} get you to wear something of theirs?'],
+[3,'Get {t} to sing “Happy Birthday” to someone whose birthday it isn’t','Did {h} get you to sing “Happy Birthday” to someone?'],
+[3,'Get {t} to let you do one bit of their makeup','Did {h} get to do some of your makeup?'],
+[3,'Get {t} to send a heart emoji to the last person they texted','Did {h} get you to send a heart to your last text?'],
+[3,'Get {t} to confess a small secret to you','Did {h} get you to confess a secret?'],
+[3,'Get {t} to attempt the worm','Did {h} get you to attempt the worm?']
+];
+// [spice, drinking?, consequence ({h}=the player who caught you)]
+const CQ=[
+[1,0,'Do your best runway walk across the room'],
+[1,0,'Let the group pick the next song'],
+[1,0,'Talk in a fake accent for the next 3 minutes'],
+[1,0,'Do 10 squats, right now'],
+[1,0,'Give a 30-second speech about why {h} is amazing'],
+[1,0,'Do your best impression of {h}'],
+[1,0,'Pay a compliment to everyone in the room'],
+[1,0,'Do the chicken dance'],
+[1,0,'Hold a plank for 20 seconds'],
+[1,0,'Strike a dramatic pose for a group photo'],
+[1,0,'Talk like a pirate for 5 minutes'],
+[1,0,'Let {h} give you a nickname for the rest of the night'],
+[1,0,'Attempt a moonwalk across the room'],
+[1,0,'Sing the chorus of a song {h} picks'],
+[1,0,'Do an animal impression. The group picks the animal'],
+[1,0,'Whisper everything you say for 3 minutes'],
+[1,0,'Act out a movie scene until someone guesses the film'],
+[1,0,'Bow to {h} every time you pass them for 10 minutes'],
+[2,0,'Let {h} write your next Instagram story (you get one veto)'],
+[2,0,'Show the group the last photo you took'],
+[2,0,'Read your last sent text out loud'],
+[2,0,'Serenade {h} with a love song'],
+[2,0,'Let {h} draw a tiny doodle on your arm'],
+[2,0,'Wear something silly the group picks for 15 minutes'],
+[2,0,'Do a TikTok dance in the middle of the room'],
+[2,0,'Tell the group your most embarrassing story'],
+[2,0,'Let the group roast your recently played songs'],
+[2,0,'Be {h}’s butler for 10 minutes'],
+[2,0,'Do an interpretive dance of your day'],
+[2,0,'Speak only in questions for 5 minutes'],
+[3,0,'Give a dramatic Oscar acceptance speech'],
+[3,0,'Let {h} change your phone wallpaper for the rest of the night'],
+[3,0,'Propose to someone at the party on one knee'],
+[3,0,'Let the group pick your profile picture for 24 hours'],
+[3,0,'Sing a song of the group’s choice at full volume'],
+[3,0,'Announce “I have a confession” and confess something small'],
+[3,0,'Text a family member “I’ve joined a circus, details later” (explain tomorrow)'],
+[3,0,'Do 15 seconds of the worm, or your best attempt'],
+[3,0,'Narrate everything you do in the third person for 10 minutes'],
+[1,1,'Take a sip'],
+[1,1,'Make a toast and take a sip'],
+[1,1,'Pick someone to take a sip with you'],
+[1,1,'Take a sip together with {h}'],
+[2,1,'Take two sips'],
+[2,1,'Take a sip every time someone says your name for 3 minutes'],
+[3,1,'Take a sip with no hands'],
+[3,1,'Finish your drink']
+];
+
+/* ---------- family mode content (no drinking, kid-friendly) ---------- */
+const FM=[
+[1,'Get {t} to high-five you','Did {h} get you to high-five them?'],
+[1,'Get {t} to say the word “pickle”','Did {h} get you to say “pickle”?'],
+[1,'Get {t} to tell you their favourite animal','Did {h} get you to tell them your favourite animal?'],
+[1,'Get {t} to fist-bump you','Did {h} get you to fist-bump them?'],
+[1,'Get {t} to give you a thumbs-up','Did {h} get a thumbs-up from you?'],
+[1,'Get {t} to tell you what they had for breakfast','Did {h} get you to tell them your breakfast?'],
+[1,'Get {t} to hand you something (a cup, a napkin, anything)','Did {h} get you to hand them something?'],
+[1,'Get {t} to tell you a joke','Did {h} get you to tell them a joke?'],
+[1,'Get {t} to sing one line of any song','Did {h} get you to sing a line of a song?'],
+[1,'Get {t} to say your name','Did {h} get you to say their name?'],
+[1,'Get {t} to smile for a photo with you','Did {h} get a photo with you?'],
+[1,'Get {t} to tell you their favourite colour','Did {h} get you to tell them your favourite colour?'],
+[1,'Get {t} to wave at you from across the room','Did {h} get you to wave at them?'],
+[1,'Get {t} to say “good job” to you','Did {h} get you to say “good job”?'],
+[1,'Get {t} to tell you about their best holiday ever','Did {h} get you to tell them about your best holiday?'],
+[1,'Get {t} to count to five out loud','Did {h} get you to count to five?'],
+[1,'Get {t} to give you a compliment','Did {h} get you to compliment them?'],
+[2,'Get {t} to do a silly dance with you','Did {h} get you to do a silly dance?'],
+[2,'Get {t} to make an animal noise','Did {h} get you to make an animal noise?'],
+[2,'Get {t} to teach you a secret handshake','Did {h} get you to teach them a handshake?'],
+[2,'Get {t} to play rock-paper-scissors with you','Did {h} get you to play rock-paper-scissors?'],
+[2,'Get {t} to thumb-wrestle you','Did {h} get you to thumb-wrestle them?'],
+[2,'Get {t} into a staring contest with you','Did {h} get you into a staring contest?'],
+[2,'Get {t} to do an impression of someone in the family','Did {h} get you to do a family impression?'],
+[2,'Get {t} to hop on one foot','Did {h} get you to hop on one foot?'],
+[2,'Get {t} to talk like a robot','Did {h} get you to talk like a robot?'],
+[2,'Get {t} to tell you their funniest memory','Did {h} get you to tell them your funniest memory?'],
+[2,'Get {t} to give you a hug','Did {h} get a hug from you?'],
+[2,'Get {t} to draw something for you','Did {h} get you to draw something for them?'],
+[2,'Get {t} to do 5 jumping jacks','Did {h} get you to do 5 jumping jacks?'],
+[2,'Get {t} to swap seats with you','Did {h} get you to swap seats?'],
+[2,'Get {t} to make a funny face','Did {h} get you to make a funny face?'],
+[3,'Get {t} to strike a superhero pose','Did {h} get you to do a superhero pose?'],
+[3,'Get {t} to sing “Happy Birthday” to someone whose birthday it isn’t','Did {h} get you to sing “Happy Birthday” to someone?'],
+[3,'Get {t} to give a speech about their favourite food','Did {h} get you to give a food speech?'],
+[3,'Get {t} to start a conga line','Did {h} get you to start a conga line?'],
+[3,'Get {t} to do their best evil laugh','Did {h} get you to do an evil laugh?'],
+[3,'Get {t} to walk like a penguin across the room','Did {h} get you to walk like a penguin?'],
+[3,'Get {t} to talk in a funny accent for a whole minute','Did {h} get you to talk in an accent?'],
+[3,'Get {t} to yell “I’m the king of the world!”','Did {h} get you to yell “I’m the king of the world!”?'],
+[3,'Get {t} to do a runway walk across the room','Did {h} get you to do a runway walk?'],
+[3,'Get {t} to make up a short story about a dragon','Did {h} get you to tell a dragon story?'],
+[3,'Get {t} to bow to you like you’re royalty','Did {h} get you to bow to them?'],
+[3,'Get {t} to freeze like a statue for 10 seconds','Did {h} get you to freeze like a statue?'],
+[3,'Get {t} to do the robot dance','Did {h} get you to do the robot dance?'],
+[3,'Get {t} to pretend to be a TV chef for 30 seconds','Did {h} get you to be a TV chef?']
+];
+const FC=[
+[1,0,'Do 10 jumping jacks'],
+[1,0,'Do an animal impression. The group picks the animal'],
+[1,0,'Sing a nursery rhyme'],
+[1,0,'Give everyone in the room a compliment'],
+[1,0,'Do the chicken dance'],
+[1,0,'Talk like a pirate for 3 minutes'],
+[1,0,'Let {h} give you a nickname for the rest of the game'],
+[1,0,'Hop on one foot for 10 seconds'],
+[1,0,'Strike a superhero pose for a photo'],
+[1,0,'Whisper everything you say for 3 minutes'],
+[1,0,'Say a tongue twister three times fast'],
+[1,0,'Do your best impression of {h}'],
+[1,0,'Spin around five times'],
+[1,0,'Make the whole room laugh (you get 3 tries)'],
+[1,0,'Tell everyone your favourite joke'],
+[2,0,'Walk like a penguin across the room'],
+[2,0,'Talk like a robot for 3 minutes'],
+[2,0,'Be {h}’s helper for 5 minutes'],
+[2,0,'Do a silly dance for 15 seconds'],
+[2,0,'Act out an animal until someone guesses it'],
+[2,0,'Tell a joke. If nobody laughs, tell another one'],
+[2,0,'Speak only in questions for 3 minutes'],
+[2,0,'Balance a pillow on your head and walk across the room'],
+[2,0,'Sing like an opera star for 15 seconds'],
+[2,0,'Be a news reporter and report on what’s happening in the room'],
+[2,0,'Bow to {h} every time you pass them for 5 minutes'],
+[2,0,'Do your best monster roar'],
+[2,0,'Hold a plank for 15 seconds'],
+[3,0,'Do a runway walk like a supermodel'],
+[3,0,'Give a dramatic award acceptance speech'],
+[3,0,'Sing a song the group picks'],
+[3,0,'Narrate everything you do in the third person for 5 minutes'],
+[3,0,'Act out a movie scene until someone guesses the film'],
+[3,0,'Let {h} style your hair however they like'],
+[3,0,'Do the robot dance for 20 seconds'],
+[3,0,'Try to moonwalk across the room'],
+[3,0,'Make up a 30-second rap about {h}'],
+[3,0,'The floor is lava for the next 2 minutes'],
+[3,0,'Talk in a funny accent for 5 minutes'],
+[3,0,'Wear a silly item the group picks for 10 minutes'],
+[3,0,'Serve {h} a snack like a fancy waiter']
+];
+
+/* ---------- big mission groups: hundreds of variations so nobody can guess ----------
+   each group: k id prefix, s spice, w weight, m/q builders, a = items for both modes,
+   p = extra items for Party only, f = extra items for Family only (items separated by |) */
+const L=s=>String(s||'').split('|').map(x=>x.trim()).filter(Boolean);
+const GROUPS=[
+{k:'w',s:1,m:x=>`Get {t} to say the word “${x}”`,q:x=>`Did {h} get you to say “${x}”?`,
+ a:'pineapple|octopus|spaghetti|kangaroo|marshmallow|flamingo|avocado|trampoline|broccoli|volcano|penguin|giraffe|cucumber|umbrella|dinosaur|pancake|waffle|noodle|jellyfish|unicorn|tornado|cactus|hamster|burrito|lasagna|croissant|popcorn|coconut|sausage|dolphin|gorilla|lobster|moustache|pyjamas|bubble|spatula|zucchini|platypus|armadillo|hippopotamus|crocodile|accordion|saxophone|tuba|kazoo|yodel|wizard|astronaut|submarine|helicopter|rollercoaster|igloo|eggplant|pretzel|nugget|sprinkles|cupcake|bagel|meatball|kiwi|mango|papaya|watermelon|blueberry|walnut|peanut|cinnamon|vanilla|ketchup|mayonnaise|mustard|sushi|taco|nachos|toaster|blender|vacuum cleaner|sock|slipper|flip-flop|backpack|lollipop|pumpkin|turnip|potato|carrot|radish|beetroot|goose|llama|alpaca|sloth|koala|panda|zebra|walrus|moose|raccoon|squirrel|hedgehog|ostrich|peacock|parrot|toucan|chameleon|iguana|tadpole|ladybug|caterpillar|butterfly|snowman|sandcastle|galaxy|comet|rainbow|thunder|glitter|confetti|balloon|karaoke|Wednesday|December|Mississippi|Antarctica|Australia|abracadabra|hullabaloo|gobbledygook|bamboozle|kerfuffle|shenanigans|flabbergasted|discombobulated|ridiculous|spectacular|magnificent|delicious|wobbly|squishy|crunchy|fluffy|banjo|xylophone|bulldozer|lighthouse|treasure|pickaxe|chopsticks|doughnut|jelly|custard|haystack|scarecrow|parachute',
+ p:'tequila|prosecco|hangover|espresso martini|taxes|mortgage|LinkedIn|situationship|brunch|karaoke bar',
+ f:'homework|recess|crayon|bedtime|lunchbox|playground|sticker|piggy bank|bubble bath|teddy bear'},
+{k:'v',s:1,m:x=>`Get {t} to tell you their favourite ${x}`,q:x=>`Did {h} get you to tell them your favourite ${x}?`,
+ a:'movie|pizza topping|ice cream flavour|cartoon|superhero|song right now|board game|sport|season|holiday|dessert|smell|word|number|day of the week|emoji|video game|book|fruit|vegetable|breakfast food|sandwich|dinosaur|car|city|country|room in their home|piece of clothing|snack|sweet|cereal|soup|cheese|pasta shape|sauce|app|TV show|animated movie|school subject|childhood toy|bird|sea creature|insect|flower|planet|Olympic sport|song to sing in the car|way to eat potatoes|time of day|kind of weather|card game|dance move|font|ride at a fair',
+ p:'cocktail|wine|hangover cure|dating app horror story|guilty-pleasure song|reality TV show|celebrity scandal',
+ f:'bedtime story|playground game|animal at the zoo|Lego set|cartoon character|crayon colour'},
+{k:'i',s:2,m:x=>`Get {t} to do an impression of ${x}`,q:x=>`Did {h} get you to do an impression of ${x}?`,
+ a:'a cat|a dog|a chicken|a monkey|a T-rex|a robot|a baby|a news reporter|a sports commentator|a weather presenter|a teacher|a grandma|an opera singer|a pirate|a cowboy|a zombie|a vampire|a ghost|a superhero|a villain|a tour guide|a flight attendant|a fancy waiter|a fashion model|a bodybuilder|a ballerina|a rock star|a magician|a mime|a toddler having a tantrum|a sleepy bear|a snake|a penguin|an elephant|a horse|a frog|a seagull|a game show host|a famous chef|an alien',
+ p:'someone at this party|their boss|a drunk uncle at a wedding|an influencer filming a story|a tired parent',
+ f:'their teacher|a parent waking them up|a princess|a dragon|a puppy wanting a treat'},
+{k:'n',s:1,m:x=>`Get {t} to make the sound of ${x}`,q:x=>`Did {h} get you to make the sound of ${x}?`,
+ a:'a cow|a duck|a lion|a wolf howling|a car engine|a police siren|a doorbell|a phone ringing|a train|a rooster|an owl|a sheep|a pig|a goat|a cat purring|a motorbike|a helicopter|rain|thunder|a squeaky door|a balloon going down|a laser|a spaceship|a dolphin|a crow|an alarm clock|a microwave beep|a race car|a bee|a whale|a horse galloping|a kettle boiling|a fire truck',
+ p:'a champagne cork|a car alarm at 3am|a dial-up modem',f:'a dinosaur|a baby elephant|a monster under the bed'},
+{k:'a',s:2,m:x=>`Get {t} to pretend to be ${x} for 10 seconds`,q:x=>`Did {h} get you to pretend to be ${x}?`,
+ a:'a statue|a tree in the wind|a flamingo|a crab walking sideways|a robot running out of battery|a wind-up toy|a jellyfish|a T-rex with tiny arms|a cat stretching|a sleepy sloth|a melting snowman|a puppet on strings|a flower blooming|a superhero landing|a slow-motion runner|a DJ|an air-guitar legend|a mime trapped in a box|a bird learning to fly|a washing machine|a sprinkler|a toaster popping|a jack-in-the-box|a spinning top|a zombie waking up|a ninja|a karate master|a kangaroo|a penguin sliding|a royal guard|a lighthouse|a vacuum cleaner|a frog catching a fly',
+ p:'a bouncer at a club|a contestant on a dating show|a waiter who hates their job',f:'a bunny|a monkey in a tree|a dragon breathing fire'},
+{k:'s',s:1,m:x=>`Get {t} to say “${x}” to you`,q:x=>`Did {h} get you to say “${x}” to them?`,
+ a:'Have a nice day|You’re my hero|Nice shoes|I owe you one|Best idea ever|You’re a genius|Thank you so much|Let’s do this|No way!|Are you serious?|That’s amazing|You win|I agree|Good morning|Bless you|See you later, alligator|Cool beans|Easy peasy|Oh my goodness|Same here|Absolutely|Fair enough|Challenge accepted|You look great|I’m hungry|What a day|Long story|Trust me|Okay, boss|Good point|Of course|Happy to help|That’s hilarious|I’m so tired|You’ve got this|Let me think|Not bad at all|Interesting|Exactly|Deal|My pleasure|For real?|Pinky promise|You’re the best|I’m impressed',
+ p:'I need a drink|Cheers to that|What happens here stays here|We should do this more often|I’m not even tipsy',
+ f:'Pretty please|You’re awesome|High five!|Yummy|I love this game'},
+{k:'k',s:1,m:x=>`Get {t} to ask you “${x}”`,q:x=>`Did {h} get you to ask them “${x}”?`,
+ a:'What time is it?|Where did you get that?|Are you okay?|Can I sit here?|What’s your secret?|Have you seen my phone?|Are you hungry?|What are you doing?|Can you help me?|Is it hot in here?|Do you like my outfit?|What song is this?|Did you hear that?|How was your day?|What’s so funny?|Can I ask you something?|Do you have a pen?|What do you recommend?|Are you following me?|Is that yours?|What did you say?|Want to hear a joke?|Do you believe in aliens?|Do you want a snack?|Can you keep a secret?|Why are you smiling?|Have we met before?|What’s your plan for tomorrow?',
+ p:'Do you want a drink?|Who are you texting?|Are you seeing anyone?|What’s in your glass?',f:'Do you want to play?|What’s your favourite animal?|Can I have some?'},
+{k:'t',s:1,m:x=>`Get {t} to tell you about ${x}`,q:x=>`Did {h} get you to tell them about ${x}?`,
+ a:'their dream holiday|their first pet|their worst haircut|their dream job as a kid|the last dream they remember|their favourite teacher|a time they got lost|the best gift they ever got|the weirdest food they’ve tried|their hidden talent|their first phone|the last movie they watched|the song stuck in their head|their worst cooking disaster|the best show they’ve seen live|their earliest memory|a famous person they’d love to meet|the superpower they’d want|the last thing that made them laugh|their dream house|their favourite childhood game|their favourite holiday tradition|a time they were really brave|their weirdest habit|their bucket list|what they’d do with a million euros|where they’d live if they could live anywhere|a skill they want to learn|their best day this year|the last thing they bought|their perfect sandwich|a place they want to visit|their morning routine|their proudest moment',
+ p:'their worst date|their first kiss|their most embarrassing night out|their celebrity crush|the worst job they ever had|their go-to karaoke song|their worst hangover|the last text they regret sending',
+ f:'their favourite toy|their best friend|what they want to be when they grow up|their favourite school trip|the best birthday party they had'},
+{k:'x',s:2,m:x=>`Get {t} to ${x}`,q:x=>`Did {h} get you to ${x.replace(/\byou\b/g,'them').replace(/\byour\b/g,'their')}?`,
+ a:'show you a funny photo on their phone|teach you a word in another language|do a little victory dance|sing the chorus of any song with you|play air guitar with you|count backwards from ten|tell you a tongue twister|spell their name backwards|guess your age|guess your favourite colour|rate your outfit out of ten|name five animals in five seconds|do a tiny drumroll on the table|recommend you a song|draw you a quick portrait|show you their best magic trick|teach you a dance move|clap a rhythm with you|stand up and stretch with you|balance something on their head|sit on the floor|do a slow clap|whistle a tune|show you how they laugh at a bad joke',
+ p:'pour you a drink|toast to you|take a shot of water with you like it’s tequila|show you their best flirting face|tell you their dating app opening line|do a slow dance for 5 seconds|pick your next song for you',
+ f:'race you to the other side of the room|build a tower with you|play I-spy with you|make a paper aeroplane|do a cartwheel pose|share a snack with you'}
+];
+// consequence groups, both modes (party adds its own hand-written ones on top)
+const CGROUPS=[
+{w:1,s:1,c:x=>`Talk like ${x} for the next 3 minutes`,a:'a pirate|a robot|a cowboy|a sports commentator|a news reporter|a baby|a grandpa|a superhero|a villain|a game show host|a surfer|a king or queen|a tour guide|a teacher|an alien|a spy|a sleepy sloth|a chipmunk|a drill sergeant|a fairy-tale narrator|a weather presenter|a soap-opera star|an opera singer|a nature documentary narrator|a very posh butler'},
+{w:1,s:1,c:x=>`Do your best impression of ${x}`,a:'a cat|a T-rex|a robot|a toddler having a tantrum|a fashion model|a bodybuilder|a ballerina|a rock star|a magician|a mime|a penguin|an elephant|a frog|a seagull|a famous chef|a zombie|a ghost|a weather presenter|a game show host|a monkey'},
+{w:1,s:2,c:x=>`Act out ${x} until someone guesses it`,a:'a penguin sliding|a melting snowman|a superhero landing|a T-rex with tiny arms|a washing machine|a toaster popping|a ninja|a kangaroo|a crab|a lighthouse|a jack-in-the-box|a flamingo|a sleepy sloth|a mime trapped in a box|an air-guitar legend|a robot running out of battery|a bird learning to fly|a jellyfish'},
+{w:1,s:1,c:x=>`Make the sound of ${x} until someone laughs`,a:'a cow|a duck|a lion|a wolf howling|a police siren|a rooster|an owl|a sheep|a pig|a goat|a motorbike|a helicopter|a squeaky door|a spaceship|a dolphin|an alarm clock|a whale|a fire truck'},
+{w:1,s:1,c:x=>`Do ${x}, right now`,a:'10 jumping jacks|10 squats|5 push-ups (knees are fine)|a 15-second plank|20 seconds of running on the spot|5 star jumps|a 10-second wall sit|10 arm circles while humming|a dramatic slow-motion spin|3 bows to the whole room'}
+];
+
+/* ---------- helpers ---------- */
+const PREFIX='secretmissions-v1-';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rid=(n=10)=>{const a='abcdefghijkmnpqrstuvwxyz23456789';let s='';for(const x of crypto.getRandomValues(new Uint8Array(n)))s+=a[x%a.length];return s};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const genCode=()=>{const a='ABCDEFGHJKMNPQRSTUVWXYZ';let s='';for(const x of crypto.getRandomValues(new Uint8Array(4)))s+=a[x%a.length];return s};
+const fill=(tpl,t,h)=>String(tpl).replace(/\{t\}/g,t).replace(/\{h\}/g,h);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const DRINKY=/\b(drink|sip|shot|chug|beer|wine|vodka|rakija|glass)/i;
+const tm=at=>new Date(at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+const joinUrl=code=>location.origin+location.pathname+'?room='+code;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2600)}
+function buzz(p){try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
+/* sound: browsers only allow it after the first tap, so we unlock on any click */
+let actx=null;
+function unlockAudio(){try{if(!actx){const A=window.AudioContext||window.webkitAudioContext;if(A)actx=new A()}if(actx&&actx.state==='suspended')actx.resume()}catch(e){}}
+function chime(notes){
+  if(!actx)return;
+  try{let t=actx.currentTime;for(const f of notes){const o=actx.createOscillator(),g=actx.createGain();o.type='triangle';o.frequency.value=f;
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.35,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.28);
+    o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+0.3);t+=0.16}}catch(e){}
+}
+const TITLE='Secret Missions';let flashT=null;
+function flashTitle(msg){clearInterval(flashT);let on=false;flashT=setInterval(()=>{on=!on;document.title=on?msg:TITLE},900);document.title=msg}
+function stopFlash(){clearInterval(flashT);flashT=null;document.title=TITLE}
+function news(html){
+  const n=$('#news');n.innerHTML=html;n.classList.add('show');clearTimeout(news.h);news.h=setTimeout(()=>n.classList.remove('show'),5000);
+}
+function boom(){
+  buzz([90,50,140]);
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const cols=['#ff2e93','#22e6d8','#c6ff3d','#ffd23d','#a66bff'];let h='';
+  for(let i=0;i<46;i++)h+=`<span style="left:${(Math.random()*100).toFixed(1)}vw;background:${cols[i%5]};--dx:${(Math.random()*40-20).toFixed(1)}vw;animation-delay:${(Math.random()*.25).toFixed(2)}s;animation-duration:${(1.2+Math.random()*.9).toFixed(2)}s"></span>`;
+  $('#fx').innerHTML=h;setTimeout(()=>{$('#fx').innerHTML=''},2600);
+}
+
+/* ---------- app state ---------- */
+let mode=null;            // 'host' | 'client'
+let V=null, lastJson='';  // latest view of the game for this phone
+let net='idle';
+let ui={screen:'home',tab:'mission',qr:false,kick:null,end:false,done:new Set(),lastM:''};
+let draft=null;
+let wakeOn=false, wl=null;
+
+/* =========================================================
+   HOST: this phone holds the whole game and serves others
+   ========================================================= */
+let H=null, hostPeer=null, lastStart=0;
+const conns=new Map(); // pid -> DataConnection
+
+function newPlayer(name,nd){return{name,nd:!!nd,score:0,hits:0,mission:null,pending:null,rerolls:H?H.settings.rerolls:2,used:[],usedC:[],notices:[],removed:false,joined:Date.now()}}
+function active(){return Object.entries(H.players).filter(([,p])=>!p.removed)}
+function nameOf(id){const p=H.players[id];return p?p.name:'Someone'}
+function isOn(id){if(id===H.hostPid)return true;const c=conns.get(id);return !!(c&&c.open)}
+function parseCustom(d){
+  const lines=s=>String(s||'').split('\n').map(x=>x.trim().slice(0,120)).filter(Boolean).slice(0,60);
+  return{raw:{cm:d.cm||'',cc:d.cc||''},missions:lines(d.cm).map(t=>t.includes('@')?t.replace(/@/g,'{t}'):'With {t}: '+t),cons:lines(d.cc)};
+}
+// mission categories: hand-written list (weight 4), each big group (weight 1), custom (weight 3)
+function missionCats(){
+  const fam=!!H.settings.family,sp=H.settings.spice;
+  const cats=[{w:4,list:(fam?FM:M).map((x,i)=>({id:(fam?'f':'b')+i,s:x[0],m:x[1],q:x[2]})).filter(x=>x.s<=sp)}];
+  for(const g of GROUPS){
+    if(g.s>sp)continue;
+    const items=L(g.a).map((x,i)=>({id:g.k+i,x})).concat(L(fam?g.f:g.p).map((x,i)=>({id:g.k+(fam?'f':'p')+i,x})));
+    cats.push({w:1,list:items.map(o=>({id:o.id,m:g.m(o.x),q:g.q(o.x)}))});
+  }
+  if(H.custom.missions.length)cats.push({w:3,list:H.custom.missions.map((m,i)=>({id:'c'+i,m,q:null}))});
+  return cats.filter(c=>c.list.length);
+}
+function weighted(cats){let r=Math.random()*cats.reduce((a,c)=>a+c.w,0);for(const c of cats){r-=c.w;if(r<=0)return c}return cats[cats.length-1]}
+function missionCount(){return missionCats().reduce((a,c)=>a+c.list.length,0)}
+function assign(pid){
+  const p=H.players[pid];
+  const others=active().map(([id])=>id).filter(id=>id!==pid);
+  if(!others.length){p.mission=null;return}
+  const prev=p.mission&&p.mission.tid;
+  let cand=others.length>1&&prev?others.filter(id=>id!==prev):others;
+  const load=id=>active().filter(([oid,q])=>oid!==pid&&q.mission&&q.mission.tid===id).length;
+  const min=Math.min(...cand.map(load));cand=cand.filter(id=>load(id)===min);
+  const tid=pick(cand);
+  const all=missionCats();
+  // nobody in the room should hold the same mission at the same time
+  const held=new Set(active().map(([,q])=>q.mission&&q.mission.id).filter(Boolean));
+  let cats=all.map(c=>({w:c.w,list:c.list.filter(x=>!p.used.includes(x.id)&&!held.has(x.id))})).filter(c=>c.list.length);
+  if(!cats.length){p.used=[];cats=all}
+  const mm=pick(weighted(cats).list);p.used.push(mm.id);if(p.used.length>400)p.used.shift();
+  p.mission={id:mm.id,m:mm.m,q:mm.q,tid,at:Date.now()};
+}
+function pickCons(target,holderName){
+  const fam=!!H.settings.family;
+  const drink=!fam&&H.settings.drinking&&!target.nd;
+  const sp=H.settings.spice;
+  const cats=[{w:4,list:(fam?FC:CQ).filter(x=>x[0]<=sp&&(drink||!x[1])).map(x=>x[2])}];
+  for(const g of CGROUPS)if(g.s<=sp)cats.push({w:g.w,list:L(g.a).map(g.c)});
+  const cust=H.custom.cons.filter(c=>drink||!DRINKY.test(c));if(cust.length)cats.push({w:3,list:cust});
+  let fresh=cats.map(c=>({w:c.w,list:c.list.filter(x=>!target.usedC.includes(x))})).filter(c=>c.list.length);
+  if(!fresh.length){target.usedC=[];fresh=cats.filter(c=>c.list.length)}
+  const c=pick(weighted(fresh).list);target.usedC.push(c);if(target.usedC.length>80)target.usedC.shift();
+  return fill(c,target.name,holderName);
+}
+function cancelPendingFor(pid){
+  for(const c of Object.values(H.claims)){
+    if(c.st==='pending'&&(c.from===pid||c.to===pid)){c.st='cancel';const hp=H.players[c.from];if(hp)hp.pending=null}
+  }
+}
+function handle(pid,msg){
+  const p=H.players[pid];if(!p||p.removed||!msg)return;
+  switch(msg.t){
+    case 'claim':{
+      if(H.status!=='playing'||!p.mission||p.pending)return;
+      const tp=H.players[p.mission.tid];
+      if(!tp||tp.removed){assign(pid);break}
+      const cid=rid(8);
+      H.claims[cid]={from:pid,to:p.mission.tid,m:p.mission.m,q:p.mission.q,at:Date.now(),st:'pending'};
+      p.pending=cid;break}
+    case 'cancel':{
+      const c=p.pending&&H.claims[p.pending];if(c&&c.st==='pending')c.st='cancel';p.pending=null;break}
+    case 'answer':{
+      const c=H.claims[msg.cid];if(!c||c.to!==pid||c.st!=='pending')return;
+      const hp=H.players[c.from];if(!hp){c.st='cancel';break}
+      const mtext=fill(c.m,p.name,hp.name);
+      if(msg.yes){
+        const cons=pickCons(p,hp.name);
+        c.st='yes';hp.score++;p.hits++;
+        H.log.push({at:Date.now(),from:c.from,to:pid,m:mtext,cons});
+        p.notices.push({id:rid(6),k:'cons',text:cons,by:hp.name,m:mtext});
+        hp.notices.push({id:rid(6),k:'scored',by:p.name,text:cons});
+        hp.pending=null;assign(c.from);
+      }else{
+        c.st='no';hp.pending=null;
+        hp.notices.push({id:rid(6),k:'denied',by:p.name});
+      }
+      break}
+    case 'reroll':
+      if(H.status==='playing'&&p.rerolls>0&&!p.pending){p.rerolls--;assign(pid)}else return;
+      break;
+    case 'ack':p.notices=p.notices.filter(n=>n.id!==msg.id);break;
+    case 'nd':p.nd=!!msg.v;break;
+    default:return;
+  }
+  commit();
+}
+function hostAct(a,arg){
+  if(a==='start'){
+    if(active().length<2)return;
+    H.status='playing';
+    for(const [id,p] of active()){p.rerolls=H.settings.rerolls;if(!p.mission)assign(id)}
+  }else if(a==='end'){
+    for(const c of Object.values(H.claims))if(c.st==='pending')c.st='cancel';
+    for(const [,p] of active())p.pending=null;
+    H.status='ended';
+  }else if(a==='reset'){
+    H.status='lobby';H.log=[];H.claims={};
+    for(const [,p] of active())Object.assign(p,{score:0,hits:0,mission:null,pending:null,notices:[],used:[],usedC:[],rerolls:H.settings.rerolls});
+  }else if(a==='kick'){
+    const p=H.players[arg];if(!p||arg===H.hostPid)return;
+    cancelPendingFor(arg);p.removed=true;p.mission=null;p.pending=null;
+    if(H.status==='playing')for(const [id,q] of active())if(q.mission&&q.mission.tid===arg)assign(id);
+    const cn=conns.get(arg);
+    if(cn){try{cn.send({t:'kicked'})}catch(e){}setTimeout(()=>{try{cn.close()}catch(e){}},400);conns.delete(arg)}
+  }
+  commit();
+}
+function view(pid){
+  const p=H.players[pid];
+  const players=Object.entries(H.players).filter(([,q])=>!q.removed).map(([id,q])=>({id,name:q.name,score:q.score,hits:q.hits,on:isOn(id),host:id===H.hostPid,me:id===pid}));
+  const mission=p.mission?{text:fill(p.mission.m,nameOf(p.mission.tid),p.name)}:null;
+  const reqs=Object.entries(H.claims).filter(([,c])=>c.to===pid&&c.st==='pending').map(([cid,c])=>{
+    const h=nameOf(c.from);
+    return{cid,from:h,q:c.q?fill(c.q,p.name,h):`${h}’s mission was: “${fill(c.m,p.name,h)}”. Did it happen?`};
+  });
+  const pc=p.pending&&H.claims[p.pending];
+  return{t:'state',code:H.code,status:H.status,spice:H.settings.spice,family:!!H.settings.family,pool:missionCount(),drinking:!H.settings.family&&H.settings.drinking,swaps:H.settings.rerolls,host:nameOf(H.hostPid),
+    players,me:{id:pid,name:p.name,nd:p.nd,score:p.score,mission,pending:pc?nameOf(pc.to):null,rerolls:p.rerolls,notices:p.notices},
+    reqs,log:H.log.map(l=>({from:nameOf(l.from),to:nameOf(l.to),m:l.m,cons:l.cons,at:l.at}))};
+}
+function save(){if(H)LS.set('sm-state-'+H.code,H)}
+function broadcast(){
+  if(!H)return;
+  for(const [pid,c] of conns){if(c.open&&H.players[pid]&&!H.players[pid].removed){try{c.send(view(pid))}catch(e){}}}
+}
+function commit(){
+  if(!H)return;
+  if(H.log.length>300)H.log=H.log.slice(-300);
+  const cl=Object.entries(H.claims);
+  if(cl.length>200)for(const [cid,c] of cl.slice(0,cl.length-200))if(c.st!=='pending')delete H.claims[cid];
+  save();broadcast();onState(view(H.hostPid));
+}
+function onHostData(conn,d){
+  if(!d||typeof d!=='object'||!H)return;
+  if(d.t==='join'){
+    const pid=String(d.pid||'').slice(0,24);if(!pid||pid===H.hostPid)return;
+    const raw=String(d.name||'').trim().slice(0,20)||'Player';
+    let p=H.players[pid];
+    if(p&&p.removed){try{conn.send({t:'kicked'})}catch(e){}return}
+    const taken=n=>active().some(([id,q])=>id!==pid&&q.name.toLowerCase()===n.toLowerCase());
+    let nm=raw,i=2;while(taken(nm))nm=raw+' '+(i++);
+    if(!p){
+      if(active().length>=20){try{conn.send({t:'full'})}catch(e){}return}
+      p=H.players[pid]=newPlayer(nm,d.nd);
+      if(H.status==='playing')assign(pid);
+    }else{p.name=nm;p.nd=!!d.nd}
+    const old=conns.get(pid);if(old&&old!==conn){try{old.close()}catch(e){}}
+    conns.set(pid,conn);conn._pid=pid;
+    if(H.status==='playing')for(const [id,q] of active())if(!q.mission)assign(id);
+    commit();return;
+  }
+  if(conn._pid&&conns.get(conn._pid)===conn)handle(conn._pid,d);
+}
+function dropConn(conn){if(conn._pid&&conns.get(conn._pid)===conn){conns.delete(conn._pid);if(H){broadcast();onState(view(H.hostPid))}}}
+function startHostPeer(){
+  if(typeof Peer==='undefined'){setNet('nolib');return}
+  lastStart=Date.now();
+  if(hostPeer&&!hostPeer.destroyed){try{hostPeer.destroy()}catch(e){}}
+  setNet('connecting');
+  const peer=new Peer(PREFIX+H.code,{debug:0});hostPeer=peer;
+  peer.on('open',()=>{if(hostPeer!==peer)return;if(H.fresh){delete H.fresh;save()}setNet('ok')});
+  peer.on('connection',conn=>{
+    conn.on('data',d=>onHostData(conn,d));
+    conn.on('close',()=>dropConn(conn));
+    conn.on('error',()=>dropConn(conn));
+  });
+  peer.on('disconnected',()=>{if(hostPeer===peer)setNet('reconnecting')});
+  peer.on('error',e=>{
+    if(hostPeer!==peer)return;
+    if(e.type==='unavailable-id'){
+      if(H.fresh){ // brand-new room code clashed: pick another
+        LS.del('sm-state-'+H.code);H.code=genCode();
+        const me=LS.get('sm-me',{});me.code=H.code;LS.set('sm-me',me);
+        commit();startHostPeer();
+      }else{setNet('restoring');try{peer.destroy()}catch(x){}}
+      return;
+    }
+    if(e.type==='browser-incompatible'){setNet('nolib');return}
+    if(e.type!=='peer-unavailable')setNet('reconnecting');
+  });
+}
+function heal(){
+  if(mode!=='host'||!H)return;
+  if(!hostPeer||hostPeer.destroyed){if(Date.now()-lastStart>4000)startHostPeer();return}
+  if(hostPeer.disconnected){try{hostPeer.reconnect()}catch(e){if(Date.now()-lastStart>4000)startHostPeer()}}
+}
+async function wake(){
+  if(mode!=='host'||!wakeOn||wl||document.visibilityState!=='visible')return;
+  try{if(navigator.wakeLock){wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>{wl=null})}}catch(e){wl=null}
+}
+function unwake(){if(wl){try{wl.release()}catch(e){}wl=null}}
+
+/* =========================================================
+   CLIENT: connects to the host's phone
+   ========================================================= */
+let C=null;
+function startClient(o){
+  if(typeof Peer==='undefined'){toast('Couldn’t load the game engine. Check your internet and reload.');return}
+  mode='client';V=null;lastJson='';
+  C={code:o.code,pid:o.pid,name:o.name,nd:!!o.nd,peer:null,conn:null,last:0,tried:0,peerAt:0};
+  LS.set('sm-me',{code:C.code,pid:C.pid,name:C.name,nd:C.nd,host:false});LS.set('sm-name',C.name);
+  ui.screen='connecting';renderConnecting();clientConnect();
+}
+function makeClientPeer(){
+  setNet('connecting');
+  const p=new Peer({debug:0});C.peer=p;C.peerAt=Date.now();
+  p.on('open',()=>{if(C&&C.peer===p)openConn()});
+  p.on('error',e=>{if(!C||C.peer!==p)return;setNet(e.type==='peer-unavailable'?'nohost':'reconnecting')});
+}
+function clientConnect(){
+  if(!C)return;
+  C.tried=Date.now();
+  if(C.conn){if(C.conn.open&&Date.now()-C.last<25000)return;const c=C.conn;C.conn=null;try{c.close()}catch(e){}}
+  const p=C.peer;
+  if(!p||p.destroyed||(!p.open&&!p.disconnected&&Date.now()-C.peerAt>15000)){if(p&&!p.destroyed){try{p.destroy()}catch(e){}}makeClientPeer();return}
+  if(p.disconnected){try{p.reconnect()}catch(e){try{p.destroy()}catch(x){}C.peer=null}return}
+  if(p.open)openConn();
+}
+function openConn(){
+  if(!C||(C.conn&&C.conn.open))return;
+  const conn=C.peer.connect(PREFIX+C.code,{reliable:true});C.conn=conn;
+  conn.on('open',()=>{if(!C||C.conn!==conn)return;C.last=Date.now();setNet('ok');conn.send({t:'join',pid:C.pid,name:C.name,nd:C.nd})});
+  conn.on('data',d=>{if(!C||C.conn!==conn)return;C.last=Date.now();
+    if(d&&d.t==='kicked'){toast('The host removed you from this game');leave();return}
+    if(d&&d.t==='full'){toast('This game is full (20 players)');leave();return}
+    if(d&&d.t==='state')onState(d)});
+  conn.on('close',()=>{if(!C||C.conn!==conn)return;C.conn=null;setNet('reconnecting');setTimeout(()=>{if(C&&!C.conn)clientConnect()},1500)});
+  conn.on('error',()=>{if(!C||C.conn!==conn)return;C.conn=null;setNet('reconnecting')});
+}
+function send(msg){
+  if(mode==='host'){handle(H.hostPid,msg);return}
+  if(C&&C.conn&&C.conn.open){try{C.conn.send(msg)}catch(e){toast('Not connected, retrying…')}}
+  else{toast('Not connected to the host yet, retrying…');clientConnect()}
+}
+function leave(){
+  if(mode==='host'){unwake();if(hostPeer){try{hostPeer.destroy()}catch(e){}}hostPeer=null;conns.clear();H=null}
+  if(C){const p=C.peer;C=null;if(p){try{p.destroy()}catch(e){}}}
+  mode=null;V=null;lastJson='';LS.del('sm-me');
+  ui={screen:'home',tab:'mission',qr:false,kick:null,end:false,done:new Set(),lastM:''};
+  $('#modal').innerHTML='';modalKey='';setNet('idle');renderHome();
+}
+
+/* watchdog: keeps everyone connected through screen locks and wifi hiccups */
+setInterval(()=>{
+  if(mode==='client'&&C){const ok=C.conn&&C.conn.open&&Date.now()-C.last<25000;if(!ok&&Date.now()-C.tried>6000)clientConnect()}
+  if(mode==='host')heal();
+},3000);
+setInterval(()=>{if(mode==='host')broadcast()},8000);
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState!=='visible')return;
+  if(mode==='client'&&C){if(!(C.conn&&C.conn.open)||Date.now()-C.last>10000){C.last=0;clientConnect()}}
+  if(mode==='host'){heal();wake();broadcast()}
+});
+
+/* =========================================================
+   RENDERING
+   ========================================================= */
+const NET={idle:['',''],ok:['Live','ok'],connecting:['Connecting…','bad'],reconnecting:['Reconnecting…','bad'],nohost:['Host offline','bad'],restoring:['Restoring room…','bad'],nolib:['Offline','bad']};
+function setNet(s){net=s;const el=$('#net');if(el){el.className='net '+NET[s][1];el.textContent=NET[s][0]}if(ui.screen==='connecting')renderConnecting()}
+function hdr(){return`<header class="top"><div class="brand">Secret Missions</div><span id="net" class="net ${NET[net][1]}">${NET[net][0]}</span></header>`}
+function onState(d){
+  const j=JSON.stringify(d);if(j===lastJson&&ui.screen==='game')return;lastJson=j;
+  // banner for everyone else when a mission gets completed somewhere in the room
+  const prevLen=V&&V.code===d.code?V.log.length:null;
+  if(prevLen!=null&&d.log.length>prevLen&&d.status==='playing'){
+    const e=d.log[d.log.length-1];
+    if(e.from!==d.me.name&&e.to!==d.me.name){
+      news(`<b>${esc(e.from)}</b> completed a mission on <b>${esc(e.to)}</b>!<small>${esc(e.to)} has to: ${esc(e.cons)}</small>`);
+      chime([660,880]);buzz([50]);
+    }
+  }
+  V=d;
+  if(mode==='client'&&C){LS.set('sm-me',{code:C.code,pid:C.pid,name:d.me.name,nd:d.me.nd,host:false})}
+  if(ui.screen==='connecting')ui.screen='game';
+  if(V.status!=='playing'&&ui.tab!=='mission')ui.tab='mission';
+  if(ui.screen==='game')renderGame();
+  renderModal();
+}
+function renderHome(){
+  const me=LS.get('sm-me',null);
+  $('#app').innerHTML=`<section class="hero"><h1>Secret<br>Missions</h1>
+  <p class="lead">Everyone gets a secret mission involving someone else at the party. Pull it off, get it confirmed, and your target pays the price.</p></section>
+  ${me&&me.code?`<button class="resume" data-a="resume"><span>${me.host?'Resume hosting':'Rejoin'} <b>${esc(me.code)}</b> as ${esc(me.name)}</span><span class="arrow">→</span></button>`:''}
+  <div class="stack"><button class="btn big" data-a="go-create">Create game</button><button class="btn alt" data-a="go-join">Join game</button></div>
+  <ol class="how"><li><b>One person hosts.</b> Their phone runs the game, so they keep the app open.</li>
+  <li><b>Everyone joins</b> by scanning the QR code or typing the room code.</li>
+  <li><b>Missions are secret.</b> Pull one off, tap “Mission done”, and your target confirms.</li></ol>`;
+}
+function renderSettings(isNew){
+  const s=draft;
+  $('#app').innerHTML=`<header class="top"><button class="back" data-a="${isNew?'home':'back-game'}">← Back</button></header>
+  <h2>${isNew?'Host a game':'Game settings'}</h2>
+  <form id="sf" class="form" novalidate>
+  ${isNew?`<label class="fld"><span>Your name</span><input id="f-name" maxlength="20" autocomplete="nickname" value="${esc(s.name)}"></label>
+  ${s.family?'':`<label class="tg"><input type="checkbox" id="f-nd" ${s.nd?'checked':''}><span class="sw"></span><span>I’m not drinking tonight</span></label>`}`:''}
+  <div class="fld"><span>Game type</span><div class="seg two-up" data-g="family">${[[0,'Party','For adults, drinking optional'],[1,'Family','Kid-friendly, no drinking']].map(([v,l,d])=>`<button type="button" data-v="${v}" class="${(s.family?1:0)===v?'on':''}"><b>${l}</b><small>${d}</small></button>`).join('')}</div></div>
+  <div class="fld"><span>${s.family?'Silliness level':'Spice level'}</span><div class="seg" data-g="spice">${(s.family?[[1,'Easy','High-fives & jokes'],[2,'Silly','Dances, robots, hugs'],[3,'Wild','Speeches, conga lines']]:[[1,'Chill','High-fives & selfies'],[2,'Spicy','Hugs, accents, dares'],[3,'Chaotic','Toasts, proposals, the worm']]).map(([v,l,d])=>`<button type="button" data-v="${v}" class="${s.spice===v?'on':''}"><b>${l}</b><small>${d}</small></button>`).join('')}</div></div>
+  ${s.family?'':`<label class="tg"><input type="checkbox" id="f-drink" ${s.drinking?'checked':''}><span class="sw"></span><span>Drinking consequences<small>Non-drinkers always get a non-alcohol one</small></span></label>`}
+  <div class="fld"><span>Mission swaps per player</span><div class="seg four" data-g="rerolls">${[0,1,2,3].map(v=>`<button type="button" data-v="${v}" class="${s.rerolls===v?'on':''}"><b>${v}</b></button>`).join('')}</div></div>
+  <label class="fld"><span>Your own missions<small>One per line. Use @ for the target, e.g. “Get @ to do the macarena”</small></span><textarea id="f-cm" rows="4">${esc(s.cm)}</textarea></label>
+  <label class="fld"><span>Your own consequences<small>One per line.${s.family?'':' Ones that mention drinking skip non-drinkers.'}</small></span><textarea id="f-cc" rows="4">${esc(s.cc)}</textarea></label>
+  <button class="btn big" type="submit">${isNew?'Create game':'Save settings'}</button></form>`;
+}
+function renderJoin(code){
+  $('#app').innerHTML=`<header class="top"><button class="back" data-a="home">← Back</button></header><h2>Join a game</h2>
+  <form id="jf" class="form" novalidate>
+  <label class="fld"><span>Room code</span><input id="j-code" class="codein" maxlength="4" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" value="${esc(code||'')}"></label>
+  <label class="fld"><span>Your name</span><input id="j-name" maxlength="20" autocomplete="nickname" value="${esc(LS.get('sm-name',''))}"></label>
+  <label class="tg"><input type="checkbox" id="j-nd"><span class="sw"></span><span>I’m not drinking tonight</span></label>
+  <button class="btn big" type="submit">Join</button></form>`;
+  const f=$(code?'#j-name':'#j-code');if(f&&!f.value)f.focus();
+}
+function renderConnecting(){
+  if(!C)return;
+  const lost=net==='nohost';
+  $('#app').innerHTML=hdr()+`<section class="hero center"><p class="lbl">Joining room</p><div class="code">${esc(C.code)}</div>
+  <div class="wait"><span class="pulse"></span>${lost?`Can’t find this room yet. Check the code and make sure the host has the app open. Retrying…`:'Connecting to the host’s phone…'}</div>
+  <button class="link" data-a="leave">Cancel</button></section>`;
+}
+function qrBlock(url){try{const q=qrcode(0,'M');q.addData(url);q.make();return`<div class="qr">${q.createSvgTag(4,2)}</div>`}catch(e){return''}}
+function summary(){return (V.family?`Family game · ${['','Easy','Silly','Wild'][V.spice]}`:`Party game · ${['','Chill','Spicy','Chaotic'][V.spice]} · Drinking ${V.drinking?'on':'off'}`)+` · ${V.swaps} swap${V.swaps===1?'':'s'} each<br><b style="color:var(--lime)">${V.pool||0}</b> possible missions in the pool`}
+function ndToggle(){if(V.family)return'';return`<label class="tg"><input type="checkbox" data-a="nd" ${V.me.nd?'checked':''}><span class="sw"></span><span>I’m not drinking tonight</span></label>`}
+function kickBtn(p){return mode==='host'&&!p.host?`<button class="x" data-a="kick" data-id="${esc(p.id)}" aria-label="Remove ${esc(p.name)}">${ui.kick===p.id?'Remove?':'×'}</button>`:''}
+function scoresList(ps){return`<ol class="board">${ps.map((p,i)=>`<li class="row ${p.me?'mine':''}"><span class="rank">${i+1}</span><span class="dot ${p.on?'on':''}"></span><span class="nm">${esc(p.name)}${p.host?' (host)':''}<small>${p.hits} consequence${p.hits===1?'':'s'}</small></span><span class="pts">${p.score}</span>${kickBtn(p)}</li>`).join('')}</ol>`}
+function feedList(){
+  const l=[...V.log].reverse();
+  return l.length?`<ul class="feed">${l.map(e=>`<li><p><b>${esc(e.from)}</b> completed “${esc(e.m)}”</p><p class="cons">${esc(e.to)} had to: ${esc(e.cons)}</p><time>${tm(e.at)}</time></li>`).join('')}</ul>`:`<p class="empty">No completed missions yet. Someone’s plotting.</p>`;
+}
+const sorted=()=>[...V.players].sort((a,b)=>b.score-a.score||a.hits-b.hits);
+function lobby(){
+  const url=joinUrl(V.code);
+  return`<section><p class="lbl center">Room code</p><div class="code">${esc(V.code)}</div>${qrBlock(url)}
+  <p class="muted center small">Scan with the phone camera, or open the link and type the code.</p>
+  <button class="btn alt slim" data-a="copy">Copy invite link</button>
+  ${location.protocol==='file:'?'<p class="warn">You opened this as a file on your device, so friends can’t reach it. Put it online first (see the instructions), then open that link.</p>':''}
+  <h3>Players <span class="muted">${V.players.length}</span></h3>
+  <ul class="chips">${V.players.map(p=>`<li class="${p.on?'':'off'}">${esc(p.name)}${p.host?' <small>host</small>':''}${p.me?' <small>you</small>':''}${kickBtn(p)}</li>`).join('')}</ul>
+  ${mode==='host'?`<div class="summary">${summary()}</div><button class="btn alt" data-a="settings">Edit settings</button>
+  <button class="btn big" data-a="start" ${V.players.length<2?'disabled':''}>${V.players.length<2?'Waiting for players…':'Start the night'}</button>
+  <p class="muted small center" style="margin-top:12px">Your phone runs the game. Keep this app open tonight.</p>`
+  :`<div class="wait"><span class="pulse"></span>Waiting for ${esc(V.host)} to start…</div>`}
+  ${ndToggle()}${mode!=='host'?'<button class="link" data-a="leave">Leave game</button>':''}</section>`;
+}
+function missionTab(){
+  const m=V.me.mission;
+  const fresh=m&&m.text!==ui.lastM;if(m)ui.lastM=m.text;
+  let body;
+  if(!m)body=`<div class="card"><p class="lbl">Your secret mission</p><p class="mtext dim">Waiting for more players to join…</p></div>`;
+  else body=`<div class="card ${V.me.pending?'pend':''} ${fresh?'fresh':''}"><p class="lbl">Your secret mission</p><p class="mtext">${esc(m.text)}</p><p class="hush">Keep it secret. Don’t let them catch on.</p></div>
+  ${V.me.pending?`<div class="wait"><span class="pulse"></span>Waiting for ${esc(V.me.pending)} to confirm…</div><button class="btn alt" data-a="cancel">Cancel claim</button>`
+  :`<button class="btn big" data-a="claim">Mission done!</button><button class="btn alt" data-a="reroll" ${V.me.rerolls>0?'':'disabled'}>Swap mission · ${V.me.rerolls} left</button>`}`;
+  return`<div class="me"><span>${esc(V.me.name)}</span><span class="pts">${V.me.score} <small>pts</small></span></div>${body}${ndToggle()}`;
+}
+function hostPanel(){
+  return`<h2>Host controls</h2><p class="muted">Your phone is running the game. If it sleeps, everyone pauses until you’re back — nothing is lost.</p>
+  <label class="tg"><input type="checkbox" data-a="wake" ${wakeOn?'checked':''}><span class="sw"></span><span>Keep my screen awake${navigator.wakeLock?'':'<small>Not supported here. Turn off auto-lock in your phone settings.</small>'}</span></label>
+  <div class="summary">${summary()}</div><button class="btn alt" data-a="settings">Edit settings</button>
+  <button class="btn alt" data-a="qr">${ui.qr?'Hide invite':'Invite someone late'}</button>${ui.qr?`<div class="code sm">${esc(V.code)}</div>${qrBlock(joinUrl(V.code))}`:''}
+  <button class="btn danger" data-a="end">${ui.end?'Tap again to end the night':'End the night'}</button>`;
+}
+function recap(){
+  const ps=sorted();const top=ps.length?ps[0].score:0;const mvp=ps.filter(p=>p.score===top&&top>0);
+  const maxH=Math.max(0,...ps.map(p=>p.hits));const dared=ps.filter(p=>p.hits===maxH&&maxH>0);
+  const minH=Math.min(...ps.map(p=>p.hits));const unt=ps.filter(p=>p.hits===minH);
+  const names=a=>a.map(p=>esc(p.name)).join(' & ');
+  return`<section class="recap"><p class="lbl center">That’s a wrap</p><h1 class="center">${mvp.length?names(mvp):'Nobody'}</h1>
+  <p class="center muted">${mvp.length?`won the night with ${top} mission${top===1?'':'s'}`:'completed a mission. Next time!'}</p>
+  <div class="awards"><div><small>Most dared</small><b>${dared.length?names(dared):'—'}</b><span>${maxH} consequence${maxH===1?'':'s'}</span></div>
+  <div><small>Untouchable</small><b>${names(unt)}</b><span>${minH} consequence${minH===1?'':'s'}</span></div>
+  <div><small>Missions done</small><b>${V.log.length}</b><span>by ${ps.length} players</span></div></div>
+  ${scoresList(ps)}<h3>Every mission tonight</h3>${feedList()}
+  ${mode==='host'?'<button class="btn big" data-a="reset">Play another round</button><button class="link" data-a="leave">Close the room</button>'
+  :`<div class="wait"><span class="pulse"></span>Waiting for ${esc(V.host)}…</div><button class="link" data-a="leave">Leave game</button>`}</section>`;
+}
+function renderGame(){
+  if(!V){$('#app').innerHTML=hdr()+'<div class="wait"><span class="pulse"></span>Setting up…</div>';return}
+  let body;
+  if(V.status==='lobby')body=lobby();
+  else if(V.status==='ended')body=recap();
+  else{
+    const t=ui.tab;
+    body=t==='scores'?`<h2>Scoreboard</h2>${scoresList(sorted())}`:t==='feed'?`<h2>Tonight so far</h2>${feedList()}`:t==='host'&&mode==='host'?hostPanel():missionTab();
+    const tabs=[['mission','Mission'],['scores','Scores'],['feed','Feed']];if(mode==='host')tabs.push(['host','Host']);
+    body+=`<nav class="tabs">${tabs.map(([k,l])=>`<button data-a="tab" data-v="${k}" class="${ui.tab===k?'on':''}">${l}${k==='mission'&&V.me.pending?' <span class="badge">•</span>':''}</button>`).join('')}</nav>`;
+  }
+  $('#app').innerHTML=hdr()+body;
+}
+let modalKey='';
+function renderModal(){
+  if(!V||!mode){if(modalKey){$('#modal').innerHTML='';modalKey=''}return}
+  const r=(V.reqs||[]).find(x=>!ui.done.has('r'+x.cid));
+  const n=!r&&(V.me.notices||[]).find(x=>!ui.done.has('n'+x.id));
+  const key=r?'r'+r.cid:n?'n'+n.id:'';
+  if(key===modalKey)return;modalKey=key;
+  if(!key){$('#modal').innerHTML='';stopFlash();return}
+  if(r){chime([523,659,784,1047]);buzz([200,100,200,100,300]);flashTitle('(!) Confirm a mission')}
+  else if(n.k==='cons'){chime([784,659,523]);flashTitle('(!) You got busted')}
+  else if(n.k==='scored'){chime([523,784,1047,1319]);flashTitle('(!) Mission complete')}
+  else{chime([400,300]);stopFlash()}
+  let h='';
+  if(r){h=`<p class="lbl">${esc(r.from)} says they completed their secret mission on you</p><p class="q">${esc(r.q)}</p>
+    <div class="two"><button class="btn alt" data-a="no" data-id="${esc(r.cid)}">No</button><button class="btn" data-a="yes" data-id="${esc(r.cid)}">Yes, it happened</button></div>`;buzz([40,40,40])}
+  else if(n.k==='cons'){h=`<p class="lbl">Busted by ${esc(n.by)}</p><p class="muted small">Their mission: “${esc(n.m)}”</p><p class="lbl" style="margin-top:14px">Your consequence</p><p class="q big">${esc(n.text)}</p><button class="btn big" data-a="ack" data-id="${esc(n.id)}">Done it</button>`;boom()}
+  else if(n.k==='scored'){h=`<p class="lbl">Mission complete · +1 point</p><p class="q">${esc(n.by)} confirmed it!</p><p class="muted">Their consequence: <b style="color:var(--lime)">${esc(n.text)}</b>. Make sure they do it.</p><button class="btn big" data-a="ack" data-id="${esc(n.id)}">Next mission</button>`;boom()}
+  else{h=`<p class="lbl">Not confirmed</p><p class="q">${esc(n.by)} says it didn’t happen.</p><p class="muted">Your mission is still on. Try again.</p><button class="btn" data-a="ack" data-id="${esc(n.id)}">Keep trying</button>`;buzz([60])}
+  $('#modal').innerHTML=`<div class="ov"><div class="sheet ${r?'ask':''}" role="dialog" aria-modal="true">${h}</div></div>`;
+}
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+function readDraft(isNew){
+  if(isNew){draft.name=$('#f-name').value.trim().slice(0,20);const nd=$('#f-nd');if(nd)draft.nd=nd.checked}
+  const dr=$('#f-drink');if(dr)draft.drinking=dr.checked;draft.cm=$('#f-cm').value;draft.cc=$('#f-cc').value;
+}
+function createGame(){
+  if(typeof Peer==='undefined'){toast('Couldn’t load the game engine. Check your internet and reload.');return}
+  if(!draft.name){toast('Enter your name first');$('#f-name').focus();return}
+  const pid=rid();
+  H={code:genCode(),status:'lobby',hostPid:pid,settings:{spice:draft.spice,drinking:draft.drinking,rerolls:draft.rerolls,family:!!draft.family},custom:{raw:{},missions:[],cons:[]},players:{},claims:{},log:[],fresh:true};
+  H.custom=parseCustom(draft);H.players[pid]=newPlayer(draft.name,draft.nd);
+  mode='host';LS.set('sm-me',{code:H.code,pid,name:draft.name,host:true});LS.set('sm-name',draft.name);
+  ui.screen='game';ui.tab='mission';wakeOn=true;wake();startHostPeer();commit();
+}
+function resume(){
+  const me=LS.get('sm-me',null);if(!me)return renderHome();
+  if(me.host){
+    const st=LS.get('sm-state-'+me.code,null);
+    if(!st){toast('That game isn’t on this phone anymore');LS.del('sm-me');return renderHome()}
+    H=st;delete H.fresh;mode='host';ui.screen='game';wakeOn=true;wake();startHostPeer();commit();
+  }else startClient(me);
+}
+document.addEventListener('submit',e=>{
+  e.preventDefault();
+  if(e.target.id==='sf'){
+    const isNew=ui.screen==='create';readDraft(isNew);
+    if(isNew)createGame();
+    else{const wasFam=!!H.settings.family;H.settings={spice:draft.spice,drinking:draft.drinking,rerolls:draft.rerolls,family:!!draft.family};
+      if(wasFam!==H.settings.family&&H.status==='playing')for(const [id,p] of active())if(!p.pending){p.used=[];assign(id)}H.custom=parseCustom(draft);
+      if(H.status!=='playing')for(const [,p] of active())p.rerolls=H.settings.rerolls;
+      ui.screen='game';lastJson='';commit();toast('Settings saved')}
+  }else if(e.target.id==='jf'){
+    const code=$('#j-code').value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,4);
+    const name=$('#j-name').value.trim().slice(0,20);
+    if(code.length!==4){toast('The room code has 4 letters');return}
+    if(!name){toast('Enter your name');return}
+    const pid=LS.get('sm-pid-'+code,null)||rid();LS.set('sm-pid-'+code,pid);
+    startClient({code,pid,name,nd:$('#j-nd').checked});
+  }
+});
+document.addEventListener('click',e=>{
+  unlockAudio();
+  const seg=e.target.closest('.seg button');
+  if(seg&&draft&&seg.parentElement.dataset.g==='family'){const isNew=ui.screen==='create';readDraft(isNew);draft.family=Number(seg.dataset.v)===1;renderSettings(isNew);return}
+  if(seg&&draft){const g=seg.parentElement.dataset.g;draft[g]=Number(seg.dataset.v);seg.parentElement.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===seg));return}
+  const el=e.target.closest('[data-a]');if(!el||el.tagName==='INPUT')return;
+  const a=el.dataset.a,id=el.dataset.id,v=el.dataset.v;
+  const hadKick=ui.kick,hadEnd=ui.end;
+  if(a!=='kick')ui.kick=null;if(a!=='end')ui.end=false;
+  switch(a){
+    case 'go-create':draft={name:LS.get('sm-name',''),nd:false,family:false,spice:2,drinking:true,rerolls:2,cm:'',cc:''};ui.screen='create';renderSettings(true);scrollTo(0,0);break;
+    case 'go-join':ui.screen='join';renderJoin('');break;
+    case 'home':ui.screen='home';renderHome();break;
+    case 'back-game':ui.screen='game';lastJson='';renderGame();break;
+    case 'resume':resume();break;
+    case 'settings':draft={family:!!H.settings.family,spice:H.settings.spice,drinking:H.settings.drinking,rerolls:H.settings.rerolls,cm:H.custom.raw.cm||'',cc:H.custom.raw.cc||''};ui.screen='settings';renderSettings(false);scrollTo(0,0);break;
+    case 'start':hostAct('start');buzz(60);break;
+    case 'end':if(!hadEnd){ui.end=true;renderGame();return}hostAct('end');break;
+    case 'reset':hostAct('reset');break;
+    case 'kick':if(hadKick!==id){ui.kick=id;renderGame();return}ui.kick=null;hostAct('kick',id);break;
+    case 'claim':send({t:'claim'});buzz(30);break;
+    case 'cancel':send({t:'cancel'});break;
+    case 'reroll':send({t:'reroll'});break;
+    case 'yes':case 'no':ui.done.add('r'+id);modalKey='';$('#modal').innerHTML='';send({t:'answer',cid:id,yes:a==='yes'});renderModal();break;
+    case 'ack':ui.done.add('n'+id);modalKey='';$('#modal').innerHTML='';send({t:'ack',id});renderModal();break;
+    case 'tab':ui.tab=v;renderGame();scrollTo(0,0);break;
+    case 'qr':ui.qr=!ui.qr;renderGame();break;
+    case 'copy':{const u=joinUrl(V.code);if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(()=>toast('Invite link copied'),()=>toast(u));else toast(u);break}
+    case 'leave':leave();break;
+  }
+  if((hadKick&&a!=='kick')||(hadEnd&&a!=='end')){if(ui.screen==='game'&&a!=='tab')renderGame()}
+});
+document.addEventListener('touchstart',unlockAudio,{passive:true});
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.dataset.a==='nd'){send({t:'nd',v:el.checked});if(C)C.nd=el.checked}
+  if(el.dataset.a==='wake'){wakeOn=el.checked;if(wakeOn)wake();else unwake()}
+});
+
+/* ---------- start ---------- */
+const qp=new URLSearchParams(location.search).get('room');
+if(qp){
+  const code=qp.toUpperCase().replace(/[^A-Z]/g,'').slice(0,4);
+  const me=LS.get('sm-me',null);
+  if(me&&me.code===code&&!me.host)startClient(me);
+  else{ui.screen='join';renderJoin(code)}
+}else renderHome();
+}
+</script>
+</body>
+</html>
